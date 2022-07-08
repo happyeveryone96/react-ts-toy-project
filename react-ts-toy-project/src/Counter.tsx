@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { useCounterState, useCounterDispatch } from "./Context";
 import styled from "styled-components";
 
@@ -10,12 +11,48 @@ function Counter() {
   const decreaseCount = (count: number) =>
     dispatch({ type: "DECREMENT", count });
 
+  const [minusPressed, setMinusPressed] = useState(false);
+  const [plusPressed, setPlusPressed] = useState(false);
+
+  const handleMouseUp = () => {
+    setMinusPressed(false);
+    setPlusPressed(false);
+  };
+
+  const minusMouseDown = () => {
+    decreaseCount(1);
+    setMinusPressed(true);
+  };
+  const plusMouseDown = () => {
+    increaseCount(1);
+    setPlusPressed(true);
+  };
+
+  useEffect(() => {
+    if (minusPressed) {
+      const timer = setInterval(() => {
+        decreaseCount(1);
+      }, 200);
+      return () => clearInterval(timer);
+    }
+    if (plusPressed) {
+      const timer = setInterval(() => {
+        increaseCount(1);
+      }, 200);
+      return () => clearInterval(timer);
+    }
+  });
+
   return (
     <Container>
       <Count>count: {state.count}</Count>
       <Buttons>
-        <Button onClick={() => decreaseCount(1)}>-1</Button>
-        <Button onClick={() => increaseCount(1)}>+1</Button>
+        <Button onMouseUp={handleMouseUp} onMouseDown={minusMouseDown}>
+          -1
+        </Button>
+        <Button onMouseUp={handleMouseUp} onMouseDown={plusMouseDown}>
+          +1
+        </Button>
       </Buttons>
     </Container>
   );
